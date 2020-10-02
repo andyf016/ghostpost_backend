@@ -14,13 +14,22 @@ class PostViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'])
     def up_vote(self, request, pk=None):
         post = self.get_object()
-        serializer = self.get_serializer(post, many=False)
+        #serializer = self.get_serializer(post, many=False)
         post.up_votes = post.up_votes + 1
         post.total_votes = post.total_votes +1
         post.update = timezone.now()
         post.save()
         return Response({'status': 'upvote!'})
-        
+    
+    @action(detail=True, methods=['post'])
+    def down_vote(self, request, pk=None):
+        post = self.get_object()
+        #serializer = self.get_serializer(post, many=False)
+        post.down_votes = post.down_votes + 1
+        post.total_votes = post.total_votes - 1
+        post.update = timezone.now()
+        post.save()
+        return Response({'status': 'Downvote!'})
     
     @action(detail=False)
     def list_boasts(self, request):
@@ -44,4 +53,16 @@ class PostViewSet(viewsets.ModelViewSet):
             return self.get_paginated_response(serializer.data)
 
         serializer = self.get_serializer(boasts, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=False)
+    def highest_rated(self, request):
+        rated = Post.objects.all().order_by('-total_votes')
+
+        page = self.paginate_queryset(rated)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(rated, many=True)
         return Response(serializer.data)
