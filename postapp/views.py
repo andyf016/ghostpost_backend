@@ -5,6 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from postapp.models import Post
 from postapp.serializers import PostSerializer
+from django.utils import timezone
 
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
@@ -14,14 +15,12 @@ class PostViewSet(viewsets.ModelViewSet):
     def up_vote(self, request, pk=None):
         post = self.get_object()
         serializer = self.get_serializer(post, many=False)
-        if serializer.is_valid():
-            post.up_vote = post.up_vote + 1
-            post.total_votes = post.total_votes +1
-            post.save()
-            return Response({'status': 'upvote!'})
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+        post.up_votes = post.up_votes + 1
+        post.total_votes = post.total_votes +1
+        post.update = timezone.now()
+        post.save()
+        return Response({'status': 'upvote!'})
+        
     
     @action(detail=False)
     def list_boasts(self, request):
