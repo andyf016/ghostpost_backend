@@ -21,3 +21,15 @@ class PostViewSet(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(boasts, many=True)
         return Response(serializer.data)
+    
+    @action(detail=False)
+    def list_roasts(self, request):
+        boasts = Post.objects.filter(sentiment='r')
+
+        page = self.paginate_queryset(boasts)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(boasts, many=True)
+        return Response(serializer.data)
