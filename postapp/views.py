@@ -10,6 +10,19 @@ class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
 
+    @action(detail=True, methods=['post'])
+    def up_vote(self, request, pk=None):
+        post = self.get_object()
+        serializer = self.get_serializer(post, many=False)
+        if serializer.is_valid():
+            post.up_vote = post.up_vote + 1
+            post.total_votes = post.total_votes +1
+            post.save()
+            return Response({'status': 'upvote!'})
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    
     @action(detail=False)
     def list_boasts(self, request):
         boasts = Post.objects.filter(sentiment='b')
