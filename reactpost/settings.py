@@ -130,3 +130,4 @@ CORS_ALLOWED_ORIGINS = [
 
 CORS_ALLOW_METHODS = list(default_methods)
 CORS_ALLOW_HEADERS = list(default_headers)
+CORS_ALLOW_CREDENTIALS = True
